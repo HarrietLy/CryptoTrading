@@ -3,6 +3,7 @@ package com.project.harriet.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.harriet.constant.AppConstant;
+import com.project.harriet.dto.AggregatedPriceDTO;
 import com.project.harriet.dto.ticker.BinancePriceDTO;
 import com.project.harriet.dto.ticker.HuobiPriceDTO;
 import com.project.harriet.dto.ticker.HuobiPriceWrapper;
@@ -99,7 +100,6 @@ public class PriceAggregatorService {
         Double binanceAsk = 0d;
         Double huobiBid = 0d;
         Double huobiAsk = 0d;
-//        String[] assetList = {"BTC", "ETH"};
         for (String asset : this.assetList) {
             AggregatedPrice aggregatedPrice = new AggregatedPrice();
             aggregatedPrice.setAsset(asset);
@@ -120,6 +120,7 @@ public class PriceAggregatorService {
             logger.info("Aggregated Price for asset {} is {}", asset, aggregatedPrice);
 
             aggregatedPrice.setLastUpdatedTime(LocalDateTime.now());
+            aggregatedPrice.setCurrency("USDT");
             aggregatedPriceList.add(aggregatedPrice);
         }
         return aggregatedPriceList;
@@ -179,12 +180,21 @@ public class PriceAggregatorService {
     }
 
 
-    List<AggregatedPrice> getAggregatedPrices(String asset) {
+    public List<AggregatedPriceDTO> getAggregatedPrices(String asset) {
+        List<AggregatedPriceDTO> aggregatedPriceDTOS = new ArrayList<>();
+        List<AggregatedPrice> aggregatedPriceList = new LinkedList<>();
         if (StringUtils.isEmpty(asset)) {
-            return aggregatedPriceRepository.findAll();
+            aggregatedPriceList= aggregatedPriceRepository.findAll();
+        } else {
+            AggregatedPrice aggregatedPrice = aggregatedPriceRepository.findByAsset(asset).orElseThrow(() -> new NoSuchElementException("price not found for given asset"));
+            aggregatedPriceList = List.of(aggregatedPrice);
         }
-        AggregatedPrice aggregatedPrice = aggregatedPriceRepository.findByAsset(asset).orElseThrow(() -> new NoSuchElementException("price not found for given asset"));
-        return List.of(aggregatedPrice);
+        aggregatedPriceList.forEach(price -> {
+            AggregatedPriceDTO dto = new AggregatedPriceDTO();
+            BeanUtils.copyProperties(price, dto);
+            aggregatedPriceDTOS.add(dto);
+        });
+        return aggregatedPriceDTOS;
     }
 
 

@@ -8,7 +8,7 @@ import java.util.List;
 public interface TradingService {
 
     Long placeOrder(String orderType, String asset, BigDecimal quantity);
-    List<TransactionDTO> retrieveTransactionHisotyrbyUser(Long userId);
+    List<TransactionDTO> retrieveTransactionHistorybyUser(Long userId);
 
 
 }
