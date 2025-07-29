@@ -121,7 +121,7 @@ public class TradeExecutor {
                 transaction.setLocked(true);
                 transaction.setLastLockedTime(LocalDateTime.now());
                 transactionRepository.save(transaction);
-                logger.error("lock acquired for transaction {} ", transactionId);
+                logger.info("lock acquired for transaction {} ", transactionId);
                 return true;
             } else {
                 return false;

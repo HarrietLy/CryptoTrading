@@ -31,7 +31,7 @@ create table transaction (
     user_id bigint,
     order_type varchar(255),
     asset varchar(50),
-    quantity numeric(38,2),
+    quantity numeric(50,18),
     price float(53),
     currency varchar(50),
     order_executor varchar(255),
@@ -50,7 +50,7 @@ create table wallet_balance (
     primary key (id),
     user_id bigint,
     asset varchar(50),
-    balance numeric(38,2),
+    balance numeric(50,18),
     CONSTRAINT fk_asset_wallet FOREIGN KEY (asset) REFERENCES asset(asset_symbol),
     CONSTRAINT fk_user_wallet FOREIGN KEY (user_id) REFERENCES users(user_id),
     CONSTRAINT unique_user_asset UNIQUE (user_id, asset)

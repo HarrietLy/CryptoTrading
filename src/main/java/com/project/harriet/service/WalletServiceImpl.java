@@ -5,6 +5,7 @@ import com.project.harriet.dto.WalletBalanceDTO;
 import com.project.harriet.model.Transaction;
 import com.project.harriet.model.WalletBalance;
 import com.project.harriet.repository.WalletBalanceRepository;
+import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,7 +34,7 @@ public class WalletServiceImpl implements WalletService {
     public List<WalletBalanceDTO> retrieveWalletBalance(Long userId, String asset) {
         List<WalletBalance> walletBalances = new ArrayList<>();
         List<WalletBalanceDTO> walletBalanceDTOs = new ArrayList<>();
-        if (asset.isEmpty()) {
+        if (StringUtils.isEmpty(asset)) {
             walletBalances= walletBalanceRepository.findByUserId(userId);
         } else {
             Optional<WalletBalance> walletBalanceOpt = walletBalanceRepository.findByUserIdAndAsset(userId, asset);
