@@ -43,6 +43,8 @@ public class PriceAggregatorService {
 
     private static final Logger logger = LoggerFactory.getLogger(PriceAggregatorService.class);
 
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
+
     public PriceAggregatorService(AggregatedPriceRepository aggregatedPriceRepository, ObjectMapper objectMapper) {
         this.aggregatedPriceRepository = aggregatedPriceRepository;
         this.objectMapper = objectMapper;
@@ -52,8 +54,8 @@ public class PriceAggregatorService {
 
     @Scheduled(fixedRate = 10000)
     void fetchBestPrice() throws ExecutionException, InterruptedException, TimeoutException {
+
         logger.info("start scheduled price fetching, fetching BinancePrice and Huobi price concurrently");
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
         CompletableFuture<Map<String, Double[]>> binancePriceFuture = CompletableFuture.supplyAsync(() -> {
             try {
                 return fetchBinancePrice();

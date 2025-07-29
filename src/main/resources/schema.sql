@@ -30,14 +30,19 @@ create table transaction (
     primary key (transaction_id),
     user_id bigint,
     order_type varchar(255),
-    asset varchar(255),
+    asset varchar(50),
     quantity numeric(38,2),
+    price float(53),
+    currency varchar(50),
     order_executor varchar(255),
     order_created_time timestamp(6),
     order_completed_time timestamp(6),
     order_status varchar(255),
+    locked boolean default FALSE,
+    last_locked_time timestamp(6),
     CONSTRAINT fk_asset_trans FOREIGN KEY (asset) REFERENCES asset(asset_symbol),
-    CONSTRAINT fk_user_trans FOREIGN KEY (user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_user_trans FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_currency_trans FOREIGN KEY (currency) REFERENCES asset(asset_symbol)
 );
 
 create table wallet_balance (

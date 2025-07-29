@@ -2,6 +2,8 @@ package com.project.harriet.controller;
 
 import com.project.harriet.dto.WalletBalanceDTO;
 import com.project.harriet.service.WalletService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +19,8 @@ public class WalletController {
         this.walletService = walletService;
     }
 
-    public List<WalletBalanceDTO> retrieveWalletBalance(Long userId) {
-        return walletService.retrieveWalletBalance(userId);
+    @GetMapping("/{userId}/{asset}")
+    public List<WalletBalanceDTO> retrieveWalletBalance(@PathVariable Long userId, @PathVariable String asset) {
+        return walletService.retrieveWalletBalance(userId, asset);
     }
 }
