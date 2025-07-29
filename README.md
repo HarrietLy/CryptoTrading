@@ -8,7 +8,8 @@
 Crypto trading application that place trades based on best aggregated price based on crypto asset and trade direction BUY/SELL
 
 ### 💡 Design Consideration
-- Used database to persist and manage a FIFO queue for transaction processing
+- Use database to persist and manage a FIFO queue, and a scheduled cron to process queued transaction
+- Use a locked flag for each transaction in the database to make sure only one thread can execute trade at a time
 
 ### 🛠️ Setup Instructions
 
