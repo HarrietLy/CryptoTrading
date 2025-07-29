@@ -1,8 +1,6 @@
 package com.project.harriet.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
@@ -10,8 +8,10 @@ import java.math.BigDecimal;
 @Table(name="Wallet_Balance")
 public class WalletBalance {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long userId;
     private String asset;
     private BigDecimal balance;
 

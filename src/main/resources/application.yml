@@ -7,13 +7,18 @@ spring:
     url: jdbc:h2:mem:testdb
   jpa:
     hibernate:
-      ddl-auto: none #create
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
   sql:
     init:
-      mode: never #always  # Options: always, embedded, never
+      mode: always  # Options: always, embedded, never
 
 third-party:
   binance:
     price_url: "https://api.binance.com/api/v3/ticker/bookTicker"
   huobi:
     price_url: "https://api.huobi.pro/market/tickers"
+  price:
+    timeoutsec: 6

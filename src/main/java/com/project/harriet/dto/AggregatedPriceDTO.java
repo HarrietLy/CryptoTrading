@@ -9,8 +9,8 @@ public class AggregatedPriceDTO {
 
     private String asset;
 
-    private Double bidPrice; //in USDT
-    private Double askPrice; // in USDT
+    private Double bidPriceInUSDT;
+    private Double askPriceInUSDT;
 
     private LocalDateTime lastUpdatedTime;
 }
