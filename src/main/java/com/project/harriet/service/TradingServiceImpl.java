@@ -6,9 +6,12 @@ import com.project.harriet.model.Transaction;
 import com.project.harriet.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,10 +36,14 @@ public class TradingServiceImpl implements TradingService {
         }
 
         Transaction newTransaction = new Transaction();
+        newTransaction.setUserId(userId);
         newTransaction.setOrderType(orderType);
         newTransaction.setAsset(asset);
         newTransaction.setQuantity(quantity);
         newTransaction.setOrderStatus(AppConstant.TransactionStatus.CREATED.name());
+        newTransaction.setCurrency(currency);
+        newTransaction.setOrderCreatedTime(LocalDateTime.now());
+        newTransaction.setLocked(false);
         Transaction savedTransaction  = transactionRepository.save(newTransaction);
         logger.info("savedTransaction {} ", savedTransaction);
 
@@ -49,6 +56,13 @@ public class TradingServiceImpl implements TradingService {
     // assume access control logic is already in place to make sure only authorized user can invoke
     @Override
     public List<TransactionDTO> retrieveTransactionHistorybyUser(Long userId) {
-        return List.of();
+        List<TransactionDTO>  transactionDTOS = new ArrayList<>();
+        List<Transaction> transactions = transactionRepository.findByUserId(userId);
+        transactions.forEach(transaction -> {
+            TransactionDTO transactionDTO = new TransactionDTO();
+            BeanUtils.copyProperties(transaction, transactionDTO);
+            transactionDTOS.add(transactionDTO);
+        });
+        return transactionDTOS;
     }
 }

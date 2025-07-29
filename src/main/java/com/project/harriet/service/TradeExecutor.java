@@ -72,21 +72,34 @@ public class TradeExecutor {
             boolean success = false;
             // placing trade via exchange that offers the best price
             if(AppConstant.OrderType.BUY.name().equalsIgnoreCase(transaction.getOrderType())) {
-                if ("BINANCE".equalsIgnoreCase(price.getAskPriceSource())) {
+                if (AppConstant.PriceDataSource.BINANCE.name().equalsIgnoreCase(price.getAskPriceSource())) {
+                    logger.info("best ask price is from binance");
+                    transaction.setPrice(price.getAskPrice());
+                    transaction.setOrderExecutor(AppConstant.Exchange.BINANCE.name());
                     success= executeTradeViaBinance(transaction);
-                } else if ("HUOBI".equalsIgnoreCase(price.getAskPriceSource())) {
+                } else if (AppConstant.PriceDataSource.HUOBI.name().equalsIgnoreCase(price.getAskPriceSource())) {
+                    logger.info("best ask price is from HUOBI");
+                    transaction.setPrice(price.getAskPrice());
+                    transaction.setOrderExecutor(AppConstant.Exchange.HUOBI.name());
                     success =executeTradeViaHuobi(transaction);
                 }
             } else if(AppConstant.OrderType.SELL.name().equalsIgnoreCase(transaction.getOrderType())) {
-                if ("BINANCE".equalsIgnoreCase(price.getBidPriceSource())) {
+                if (AppConstant.PriceDataSource.BINANCE.name().equalsIgnoreCase(price.getBidPriceSource())) {
+                    logger.info("best bid price is from BINANCE");
+                    transaction.setPrice(price.getBidPrice());
+                    transaction.setOrderExecutor(AppConstant.Exchange.BINANCE.name());
                     success = executeTradeViaBinance(transaction);
-                } else if ("HUOBI".equalsIgnoreCase(price.getBidPriceSource())) {
+                } else if (AppConstant.PriceDataSource.HUOBI.name().equalsIgnoreCase(price.getBidPriceSource())) {
+                    logger.info("best bid price is from HUOBI");
+                    transaction.setPrice(price.getBidPrice());
+                    transaction.setOrderExecutor(AppConstant.Exchange.HUOBI.name());
                     success = executeTradeViaHuobi(transaction);
                 }
             }
             if (success) {
-                transaction.setOrderStatus(COMPLETED.name());
                 walletService.updateWalletBalance(transaction);
+                transaction.setOrderStatus(COMPLETED.name());
+                transaction.setOrderCompletedTime(LocalDateTime.now());
             }else{
                 logger.error("Failed to place order via exchange");
                 transaction.setOrderStatus(FAIL.name());
@@ -95,10 +108,9 @@ public class TradeExecutor {
             logger.error("Execution of trade failed for transaction {} ", transactionId, e);
             transaction.setOrderStatus(FAIL.name());
         } finally {
-            releaseLock(transactionId);
+            transaction.setLocked(false);
             transactionRepository.save(transaction);
         }
-
     }
 
     private boolean acquirelock(Long transactionId) {
@@ -106,10 +118,10 @@ public class TradeExecutor {
         if (transactionOptional.isPresent()) {
             Transaction transaction = transactionOptional.get();
             if (!transaction.getLocked()) {
-                logger.error("lock acquired for transaction {} ", transactionId);
                 transaction.setLocked(true);
                 transaction.setLastLockedTime(LocalDateTime.now());
                 transactionRepository.save(transaction);
+                logger.error("lock acquired for transaction {} ", transactionId);
                 return true;
             } else {
                 return false;
@@ -118,12 +130,13 @@ public class TradeExecutor {
         return false;
     }
 
-    private void releaseLock(Long transactionId) {
-        transactionRepository.findById(transactionId).ifPresent(transaction -> {
-            transaction.setLocked(false);
-            transactionRepository.save(transaction);
-        });
-    }
+//    private void releaseLock(Long transactionId) {
+//        transactionRepository.findById(transactionId).ifPresent(transaction -> {
+//            transaction.setLocked(false);
+//            transactionRepository.save(transaction);
+//            logger.info("Released lock for transaction {} ", transactionId);
+//        });
+//    }
 
     private boolean executeTradeViaBinance(Transaction transaction) throws InterruptedException {
         //simulating a blocking synchronous order placement to Binance exchange
@@ -136,7 +149,7 @@ public class TradeExecutor {
     private boolean executeTradeViaHuobi(Transaction transaction) throws InterruptedException {
         //simulating place order to Huobi exchange
         logger.info("placing order via Huobi");
-        Thread.sleep(60 * 1000);
+        Thread.sleep(20 * 1000);
         return true;
     }
 

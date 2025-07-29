@@ -2,6 +2,7 @@ package com.project.harriet.controller;
 
 import com.project.harriet.dto.TransactionDTO;
 import com.project.harriet.service.TradingService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/trading")
+
 public class TradingController {
 
     private final TradingService tradingService;
@@ -19,6 +21,7 @@ public class TradingController {
     }
 
     @PostMapping("/{userId}/{orderType}/{asset}/{quantity}/{currency}")
+    @Operation(summary = "place trade based on the latest best aggregated price.")
     public ResponseEntity<String> placeTrade(@PathVariable Long userId
             , @PathVariable String orderType, @PathVariable String asset
             , @PathVariable BigDecimal quantity, @PathVariable String currency) {
@@ -32,7 +35,8 @@ public class TradingController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<TransactionDTO>> fetchTrade(@PathVariable Long userId) {
+    @Operation(summary = "retrieve the user trading history")
+    public ResponseEntity<List<TransactionDTO>> fetchTradingHistory(@PathVariable Long userId) {
         try {
             List<TransactionDTO> transactionDTOS= tradingService.retrieveTransactionHistorybyUser(userId);
             return ResponseEntity.ok().body(transactionDTOS);

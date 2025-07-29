@@ -2,6 +2,7 @@ package com.project.harriet.controller;
 
 import com.project.harriet.dto.WalletBalanceDTO;
 import com.project.harriet.service.WalletService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,8 @@ public class WalletController {
     }
 
     @GetMapping("/{userId}/{asset}")
-    public List<WalletBalanceDTO> retrieveWalletBalance(@PathVariable Long userId, @PathVariable String asset) {
+    @Operation(summary = "retrieve the user’s crypto currencies wallet balance")
+    public List<WalletBalanceDTO> retrieveWalletBalance(@PathVariable Long userId, @PathVariable(required = false) String asset) {
         return walletService.retrieveWalletBalance(userId, asset);
     }
 }

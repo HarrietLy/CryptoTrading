@@ -6,6 +6,11 @@ public class AppConstant {
         BINANCE,
         HUOBI
     }
+
+    public enum Exchange{
+        BINANCE,
+        HUOBI
+    }
     public enum OrderType{
         BUY,
         SELL

@@ -24,5 +24,9 @@ VALUES
 INSERT INTO wallet_balance(user_id, asset, balance)
 VALUES
 (1,'USDT', 50000 ),
-(2,'USDT', 50000 )
+(1,'BTC', 0 ),
+(1,'ETH', 0 ),
+(2,'USDT', 50000 ),
+(2,'BTC', 0 ),
+(2,'ETH', 0 )
 ;

@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.project.harriet.constant.AppConstant.TransactionStatus.COMPLETED;
+import static com.project.harriet.constant.AppConstant.TransactionStatus.FAIL;
 
 @Service
 public class WalletServiceImpl implements WalletService {
@@ -50,9 +51,6 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void updateWalletBalance(Transaction transaction) {
-        if (!COMPLETED.name().equalsIgnoreCase(transaction.getOrderStatus())) {
-            throw new RuntimeException("cannot update wallet balance if transaction is not completed");
-        }
         WalletBalance assetWalletBalance = walletBalanceRepository.findByUserIdAndAsset(transaction.getUserId(), transaction.getAsset()).orElseThrow(()-> new NoSuchElementException("Wallet balance not found for given asset"));
         WalletBalance currencyWalletBalance = walletBalanceRepository.findByUserIdAndAsset(transaction.getUserId(), transaction.getCurrency()).orElseThrow(()-> new NoSuchElementException("Wallet balance not found for given asset"));
 
@@ -61,12 +59,18 @@ public class WalletServiceImpl implements WalletService {
         BigDecimal totalAmountInCurrency = quantity.multiply(price);
         if (AppConstant.OrderType.BUY.name().equalsIgnoreCase(transaction.getOrderType())) {
             logger.info("subtracting currency, adding asset");
+            if (currencyWalletBalance.getBalance().subtract(totalAmountInCurrency).compareTo(BigDecimal.ZERO) <0){
+                throw new RuntimeException("currency wallet balance is insufficient");
+            }
             currencyWalletBalance.setBalance(currencyWalletBalance.getBalance().subtract(totalAmountInCurrency));
-            assetWalletBalance.setBalance(currencyWalletBalance.getBalance().add(quantity));
+            assetWalletBalance.setBalance(assetWalletBalance.getBalance().add(quantity));
         } else if (AppConstant.OrderType.SELL.name().equalsIgnoreCase(transaction.getOrderType())){
             logger.info("adding currency, subtracting asset");
-            currencyWalletBalance.setBalance(currencyWalletBalance.getBalance().subtract(totalAmountInCurrency));
-            assetWalletBalance.setBalance(currencyWalletBalance.getBalance().add(quantity));
+            if (assetWalletBalance.getBalance().subtract(quantity).compareTo(BigDecimal.ZERO) <0){
+                throw new RuntimeException("asset wallet balance is insufficient");
+            }
+            currencyWalletBalance.setBalance(currencyWalletBalance.getBalance().add(totalAmountInCurrency));
+            assetWalletBalance.setBalance(assetWalletBalance.getBalance().subtract(quantity));
         }
         walletBalanceRepository.save(assetWalletBalance);
         walletBalanceRepository.save(currencyWalletBalance);
